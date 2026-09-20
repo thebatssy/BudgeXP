@@ -19,7 +19,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Expense.objects.filter(user=self.request.user)
+        # select_related('user') solves the N+1 problem by doing an INNER/LEFT JOIN on auth_user
+        queryset = Expense.objects.select_related('user').filter(user=self.request.user)
         
         month = self.request.query_params.get('month')
         year = self.request.query_params.get('year')
@@ -43,7 +44,8 @@ class BudgetViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Budget.objects.filter(user=self.request.user)
+        # Optimization added here as well
+        return Budget.objects.select_related('user').filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
