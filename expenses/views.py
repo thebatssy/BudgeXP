@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Sum
-from datetime import datetime
+from django.utils import timezone
 from .filters import ExpenseFilter
 
 from .models import Expense, Budget
@@ -36,6 +36,9 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 class BudgetViewSet(viewsets.ModelViewSet):
     serializer_class = BudgetSerializer
     permission_classes = [IsAuthenticated]
+    
+    # Disable pagination so frontend gets all active budgets in a clean list
+    pagination_class = None
 
     def get_queryset(self):
         # Optimization added here as well
@@ -51,7 +54,7 @@ class BudgetSummaryView(APIView):
     def get(self, request):
         user = request.user
        
-        now = datetime.now()
+        now = timezone.now()
         month = request.query_params.get('month', now.month)
         year = request.query_params.get('year', now.year)
 
