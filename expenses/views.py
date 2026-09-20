@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Sum
 from datetime import datetime
+from .filters import ExpenseFilter
 
 from .models import Expense, Budget
 from .serializers import ExpenseSerializer, BudgetSerializer, UserRegisterSerializer
@@ -17,23 +18,16 @@ class RegisterView(generics.CreateAPIView):
 class ExpenseViewSet(viewsets.ModelViewSet):
     serializer_class = ExpenseSerializer
     permission_classes = [IsAuthenticated]
+    
+    # Using custom filterset class instead of basic filterset_fields
+    filterset_class = ExpenseFilter
+    search_fields = ['note', 'category']
+    ordering_fields = ['amount', 'date', 'created_at']
+    ordering = ['-date']
 
     def get_queryset(self):
         # select_related('user') solves the N+1 problem by doing an INNER/LEFT JOIN on auth_user
-        queryset = Expense.objects.select_related('user').filter(user=self.request.user)
-        
-        month = self.request.query_params.get('month')
-        year = self.request.query_params.get('year')
-        category = self.request.query_params.get('category')
-
-        if month:
-            queryset = queryset.filter(date__month=month)
-        if year:
-            queryset = queryset.filter(date__year=year)
-        if category:
-            queryset = queryset.filter(category=category)
-
-        return queryset
+        return Expense.objects.select_related('user').filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
