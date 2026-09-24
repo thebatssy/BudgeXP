@@ -40,8 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'expenses',
     'django_filters',
+    'drf_spectacular',
+    'expenses',
 ]
 
 MIDDLEWARE = [
@@ -153,6 +154,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
@@ -166,4 +168,11 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
     'SIGNING_KEY': os.getenv('SECRET_KEY'),
     'ALGORITHM': 'HS256',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Personal Expense Tracker API',
+    'DESCRIPTION': 'Production-grade API for tracking expenses, budgets, and monthly analytics.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
