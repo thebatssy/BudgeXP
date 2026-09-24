@@ -31,9 +31,11 @@ class Budget(models.Model):
     monthly_limit = models.DecimalField(max_digits=10, decimal_places=2)
     month = models.IntegerField() 
     year = models.IntegerField() 
+    created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         unique_together = ['user', 'month', 'year']
+        ordering = ['-year', '-month']
     
     def __str__(self):
         return f"{self.user.username} - {self.month}/{self.year}: ₹{self.monthly_limit}"
