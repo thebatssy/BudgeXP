@@ -96,6 +96,9 @@ DATABASES = {
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST', default='localhost'),
         'PORT': env('DB_PORT', default='3306'),
+        'OPTIONS': {
+            'ssl': {'ssl-mode': 'REQUIRED'} if not DEBUG else {}
+        }
     }
 }
 
@@ -185,10 +188,12 @@ SPECTACULAR_SETTINGS = {
 
 # --- CORS Configuration ---
 CORS_ALLOW_ALL_ORIGINS = True  # Allows requests from any frontend during development/testing
-# For production strictness later, you can use:
+
+# When your frontend is deployed, switch to explicit origins:
+# CORS_ALLOW_ALL_ORIGINS = False
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:3000",
-#     "https://your-frontend-app.onrender.com",
+#     "https://your-frontend-domain.onrender.com",
 # ]
 
 # --- Static Files Configuration (for Swagger UI / Admin in production) ---
