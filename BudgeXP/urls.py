@@ -8,7 +8,7 @@ urlpatterns = [
     path('api/', include('expenses.urls')),
     
     # Redirect root URL (/) to API docs (/api/docs/)
-    path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
+    path('', RedirectView.as_view(pattern_name='swagger-ui', permanent=False)),
     
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
