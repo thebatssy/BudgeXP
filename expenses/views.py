@@ -5,14 +5,17 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Sum
 from django.utils import timezone
 from .filters import ExpenseFilter
+from .throttles import AuthRateThrottle, AnalyticsRateThrottle
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .models import Expense, Budget
 from .serializers import ExpenseSerializer, BudgetSerializer, UserRegisterSerializer
 
-
+    
 class RegisterView(generics.CreateAPIView):
-    permission_classes = [AllowAny]
     serializer_class = UserRegisterSerializer
+    permission_classes = [AllowAny]
+    throttle_classes = [AuthRateThrottle]
 
 
 class ExpenseViewSet(viewsets.ModelViewSet):
@@ -50,6 +53,7 @@ class BudgetViewSet(viewsets.ModelViewSet):
 
 class BudgetSummaryView(APIView):
     permission_classes = [IsAuthenticated]
+    throttle_classes = [AnalyticsRateThrottle]
 
     def get(self, request):
         user = request.user
@@ -82,3 +86,10 @@ class BudgetSummaryView(APIView):
             'remaining_budget': remaining_budget,
             'is_over_budget': is_over_budget
         }, status=status.HTTP_200_OK)
+
+# Subclass SimpleJWT views to add throttling
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    throttle_classes = [AuthRateThrottle]
+
+class ThrottledTokenRefreshView(TokenRefreshView):
+    throttle_classes = [AuthRateThrottle]
